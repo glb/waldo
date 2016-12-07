@@ -12,6 +12,6 @@ var settings = {
 }
 var bot = new Bot(settings)
 bot.on('start', function () {
-  bot.postMessageToUser('morganw', 'Waldo reporting for duty!')
-  bot.postMessageToUser('grahamm', 'Waldo reporting for duty!')
+  bot.postMessageToUser('morganw', 'Waldo reporting for duty!', {'as_user': 'true'})
+  bot.postMessageToUser('grahamm', 'Waldo reporting for duty!', {'as_user': 'true'})
 })
