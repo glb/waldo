@@ -1,3 +1,8 @@
+var SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN
+
+var utils = require('./libs/utils.js')
+import slack from 'slack-promise'
+
 module.exports = {
   // Returns the location of a user's desk or an error message
   whereis: function (user) {
@@ -6,7 +11,7 @@ module.exports = {
 
     if (invalidSlackUsername(user)) {        // Check for invalid Slack username
       message = '\'' + user + '\' doesn\'t look like a valid Slack username!'
-    } else if (true) {                        // Check if user exists in Slack
+    } else if (slackUserExists(user)) {                        // Check if user exists in Slack
       // Easter egg: @glb
       if (user === '@glb') {
         // TODO: call Waldo bot to message with /shrug and make sure actual location also given
@@ -40,6 +45,18 @@ module.exports = {
         // Start with letter or number, contain only those and periods, hyphens, and underscores.
       var valid = /^@[a-z0-9][a-z0-9._-]{0,20}$/.test(username)
       return !valid
+    }
+
+    // Check if the user exists in Slack
+    function slackUserExists (username) {
+      slack.users.list({SLACK_BOT_TOKEN}, (err, data) => {
+        if (err) {
+          return false   // TODO: maybe have this return an actual error message
+        } else {
+          return utils.find(data.members, { name: user })
+        }
+      })
+      return false
     }
   },
 
