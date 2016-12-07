@@ -27,7 +27,30 @@ app.route('/whereis')
 
     // Handle any help requests
     if (req.body.text === 'help') {
-      message = "HELP, YOU'RE LOST"
+      message = "Need a hand? Try this!"
+    }
+    // Check if user exists in Slack
+    else if (true) {
+      // Easter egg: @waldo
+      if (req.body.text === '@waldo') {
+        message = "20000 leagues under the sea!"
+      }
+      // Easter egg: @glb
+      else if (req.body.text === '@glb') {
+        // later call Waldo bot to message with /shrug
+      }
+      // Check if user exists in db location table
+      else if (true) {
+
+      }
+      // Return suggestion to talk to @waldo to add location
+      else {
+
+      }
+    }
+    // Return error bc user does not exist in Slack
+    else {
+
     }
 
     res.json({
