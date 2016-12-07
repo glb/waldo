@@ -4,7 +4,8 @@
   "description": "Slackbot to locate office denizens",
   "main": "index.js",
   "scripts": {
-    "test": "echo it's hack day, what's a test"
+    "test": "echo it's hack day, what's a test",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
