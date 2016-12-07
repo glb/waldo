@@ -5,7 +5,7 @@ module.exports = {
     var message = ''
 
     if (invalidSlackUsername(user)) {        // Check for invalid Slack username
-      message = user + ' doesn\'t look like a valid Slack username!'
+      message = '\'' + user + '\' doesn\'t look like a valid Slack username!'
     } else if (true) {                        // Check if user exists in Slack
       // Easter egg: @glb
       if (user === '@glb') {
