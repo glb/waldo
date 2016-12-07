@@ -23,19 +23,27 @@ app.route('/whereis')
       return res.sendStatus(401)
     }
 
-    var message = 'Hold on, I\'m consulting a map...'
+    var responseType = 'ephemeral'  // default for all help/error message responses
+    var message = ''
 
     // Handle any help requests
     if (req.body.text === 'help') {
-      message = 'Need a hand? Try this!'
-    } else if (true) {  // Check if user exists in Slack
+      message = 'Need a hand? Try asking \'/whereis @waldo\' or message @waldo and ask for help.'
+    } else if (true) {                        // Check if user exists in Slack
       var user = req.body.text
-      if (user === '@waldo') {       // Easter egg: @waldo
-        message = '20000 leagues under the sea!'
-      } else if (user === '@glb') {  // Easter egg: @glb
-        // later call Waldo bot to message with /shrug
-      } else if (false) {                      // Check if user exists in db location table
 
+      // Easter egg: @glb
+      if (user === '@glb') {
+        // TODO: call Waldo bot to message with /shrug and make sure actual location also given
+      }
+
+      // Check for user location
+      if (user === '@waldo') {                // Easter egg: @waldo
+        responseType = 'in_channel'
+        message = '@waldo is 20000 leagues under the sea!'
+      } else if (false) {                     // Check if user exists in db location table
+        responseType = 'in_channel'
+        message = user + ' is ???'        // get user location for msg
       } else {                                // Return suggestion to talk to @waldo to add location
         message = 'I don\'t know where ' + user + ' is.  If you find out, please message @waldo and tell me!'
       }
@@ -44,7 +52,7 @@ app.route('/whereis')
     }
 
     res.json({
-      response_type: 'ephemeral',
+      response_type: responseType,
       text: message
     })
   })
