@@ -1,5 +1,7 @@
+var childProcess = require('childProcess')
+
 // Setup slack bot
-// ...
+childProcess.spawn('node', ['slackbot.js'], {stdio: 'inherit'})
 
 // Setup slash command
-require('./slash_command_server.js')
+childProcess.spawn('node', ['slash_command_server.js'], {stdio: 'inherit'})
