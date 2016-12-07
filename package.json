@@ -17,8 +17,5 @@
   "license": "MIT",
   "dependencies": {
     "slackbots": "^0.5.3"
-  },
-  "devDependencies": {
-    "standard": "^8.6.0"
   }
 }
