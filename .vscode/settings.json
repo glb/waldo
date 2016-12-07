@@ -4,5 +4,6 @@
         "**/node_modules": true
     },
     "files.trimTrailingWhitespace": true,
-    "standard.autoFixOnSave": true
+    "standard.autoFixOnSave": true,
+    "editor.tabSize": 2
 }
