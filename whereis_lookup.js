@@ -1,8 +1,3 @@
-var SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN
-
-var utils = require('./libs/utils.js')
-import slack from 'slack-promise'
-
 module.exports = {
   // Returns the location of a user's desk or an error message
   whereis: function (user) {
@@ -49,13 +44,7 @@ module.exports = {
 
     // Check if the user exists in Slack
     function slackUserExists (username) {
-      slack.users.list({SLACK_BOT_TOKEN})
-      .then(res => {
-        return utils.find(res.members, { name: username })
-      })
-      .fail(res => {
-        return false
-      })
+      return true // TODO: use what graham wrote when it's done
     }
   },
 
