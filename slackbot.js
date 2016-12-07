@@ -15,5 +15,3 @@ bot.on('start', function () {
   bot.postMessageToUser('morganw', 'Waldo reporting for duty!')
   bot.postMessageToUser('grahamm', 'Waldo reporting for duty!')
 })
-
-bot.run()
