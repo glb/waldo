@@ -1,5 +1,6 @@
 var express = require('express')
 var bodyParser = require('body-parser')
+var whereis = require('./whereis_lookup.js')
 
 var VERIFY_TOKEN = process.env.SLACK_VERIFY_TOKEN
 if (!VERIFY_TOKEN) {
@@ -23,38 +24,19 @@ app.route('/whereis')
       return res.sendStatus(401)
     }
 
-    var responseType = 'ephemeral'  // default for all help/error message responses
-    var message = ''
+    var response = {}
 
     // Handle any help requests
     if (req.body.text === 'help') {
-      message = 'Need a hand? Try asking \'/whereis @waldo\' or message @waldo and ask for help.'
-    } else if (true) {                        // Check if user exists in Slack
-      var user = req.body.text
-
-      // Easter egg: @glb
-      if (user === '@glb') {
-        // TODO: call Waldo bot to message with /shrug and make sure actual location also given
-      }
-
-      // Check for user location
-      if (user === '@waldo') {                // Easter egg: @waldo
-        responseType = 'in_channel'
-        message = '@waldo is 20000 leagues under the sea!'
-      } else if (false) {                     // Check if user exists in db location table
-        responseType = 'in_channel'
-        message = user + ' is ???'        // get user location for msg
-      } else {                                // Return suggestion to talk to @waldo to add location
-        message = 'I don\'t know where ' + user + ' is.  If you find out, please message @waldo and tell me!'
-      }
-    } else {                                  // Return error bc user does not exist in Slack
-      message = 'Hmm... ' + req.body.text + 'doesn\'t seem to be a current Slack user!'
+      response = whereis.whereisHelp()
+    } else if (false) {      // Check if formatted incorrectly for user name
+      // TODO: add actual check of username format and more detailed message/attachment
+      response = { text: 'That doesn\'t look like a Slack username!'}
+    } else {                // Lookup user location
+      response = whereis.whereis(req.body.text)
     }
 
-    res.json({
-      response_type: responseType,
-      text: message
-    })
+    res.json(response)
   })
 
 app.listen(PORT, function (err) {
