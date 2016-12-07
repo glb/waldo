@@ -1,4 +1,4 @@
-var childProcess = require('childProcess')
+var childProcess = require('child_process')
 
 // Setup slack bot
 childProcess.spawn('node', ['slackbot.js'], {stdio: 'inherit'})
