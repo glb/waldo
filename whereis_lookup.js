@@ -49,14 +49,13 @@ module.exports = {
 
     // Check if the user exists in Slack
     function slackUserExists (username) {
-      slack.users.list({SLACK_BOT_TOKEN}, (err, data) => {
-        if (err) {
-          return false   // TODO: maybe have this return an actual error message
-        } else {
-          return utils.find(data.members, { name: user })
-        }
+      slack.users.list({SLACK_BOT_TOKEN})
+      .then(res => {
+        return utils.find(res.members, { name: username })
       })
-      return false
+      .fail(res => {
+        return false
+      })
     }
   },
 
