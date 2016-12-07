@@ -1,0 +1,24 @@
+{
+  "name": "waldo",
+  "version": "1.0.0",
+  "description": "Slackbot to locate office denizens",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo it's hack day, what's a test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://dsgithub.trendmicro.com/grahamm/waldo.git"
+  },
+  "keywords": [
+    "slack"
+  ],
+  "author": "Graham McGregor, Morgan Williams",
+  "license": "MIT",
+  "dependencies": {
+    "slackbots": "^0.5.3"
+  },
+  "devDependencies": {
+    "standard": "^8.6.0"
+  }
+}
