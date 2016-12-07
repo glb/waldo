@@ -25,15 +25,12 @@ app.route('/whereis')
     }
 
     var response = {}
+    var input = req.body.text
 
-    // Handle any help requests
-    if (req.body.text === 'help') {
+    if (input === 'help') {     // Handle any help requests
       response = whereis.whereisHelp()
-    } else if (false) {      // Check if formatted incorrectly for user name
-      // TODO: add actual check of username format and more detailed message/attachment
-      response = { text: 'That doesn\'t look like a Slack username!'}
-    } else {                // Lookup user location
-      response = whereis.whereis(req.body.text)
+    } else {                    // Lookup user location
+      response = whereis.whereis(input)
     }
 
     res.json(response)
