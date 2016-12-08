@@ -50,10 +50,7 @@ rtmClient.message(message => {
     return
   }
   // if waldo is mentioned, or direct messaged, reply
-  if (message.channel[0] === 'D') {
-    // TODO add @mention when functionality is more complete
-    // message.text.indexOf('@' + botUser.id) > -1 ||
-
+  if (message.channel[0] === 'D' || message.text.indexOf('@' + botUser.id) > -1) {
     if (!message.text) {
       console.error('ERROR weird message:', message)
       return
@@ -61,6 +58,12 @@ rtmClient.message(message => {
     console.log(`user messaged me: "${message.text}"`)
 
     let command = message.text
+
+    // if @mentioned trim the command
+    if (command.indexOf('@' + botUser.id) > -1) {
+      let index = command.indexOf('@' + botUser.id) + ('@' + botUser.id).length
+      command.substring(index)
+    }
 
     // whereis
     let matches = command.match(/\bwhere\s?is\s+<@(\S+)>/)
