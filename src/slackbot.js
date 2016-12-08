@@ -92,6 +92,11 @@ rtmClient.message(message => {
           channel: message.channel,
           text: help.whereis().text
         })
+      } else if (/\bmap\b/.test(commandLC)) {
+        postMessage({
+          channel: message.channel,
+          text: help.map().text
+        })
       } else {
         postMessage({
           channel: message.channel,

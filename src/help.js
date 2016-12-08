@@ -26,5 +26,8 @@ help.update = () => {
     To update the floor: \`${updatePrefix} ${floor}\`
     To update the seat: \`${updatePrefix} ${seat}\` `)
 }
+help.map = () => {
+  return message('Just ask @waldo to `show me a map`')
+}
 
 module.exports = help
