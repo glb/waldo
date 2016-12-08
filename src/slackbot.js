@@ -94,7 +94,7 @@ rtmClient.message(message => {
           whereis.updateUser(user.name, update.location)
           postMessage({
             channel: message.channel,
-            text: 'Updated!'
+            text: 'Updating...'
           })
         })
       return
