@@ -49,7 +49,7 @@ app.route('/map/:mapId')
     if (mapId === '20k') {
       res.redirect('/static/20k-under-sea-with-waldo.jpg')
     } else {
-      res.sendStatus(404)
+      res.redirect(`/static/maps/${mapId}.png`)
     }
   })
 

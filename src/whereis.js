@@ -24,6 +24,7 @@ function whereis (input) {
   return slackUserExists(username.substring(1))
     .then(user => {
       if (user) {
+        console.log(` exists: ${user.name}`)
         // Check for user location
         if (user.name === 'waldo') {               // Easter egg: @waldo
           return {
@@ -36,8 +37,10 @@ function whereis (input) {
             ]
           }
         } else {
-          dbUserExists(username)
+          console.log('before call db method')
+          return dbUserExists(username)
             .then(userRow => {
+              console.log(`got db result`)
               if (userRow) {
                 message = username + ' location:\n' + printLocation(userRow)
               } else {                               // Return suggestion to talk to @waldo to add location
@@ -53,10 +56,14 @@ function whereis (input) {
             })
         }
       } else {                                  // Return error bc user does not exist in Slack
+        console.log(`does not exist: ${username}`)
         message = `Hmm... ${username} doesn't seem to be a current Slack user!`
       }
 
       return {text: message}
+    })
+    .catch(reason => {
+      console.error('Failed in whereis', reason)
     })
 }
 
@@ -82,29 +89,29 @@ function slackUserExists (username) {
 }
 
 function dbUserExists (username) {
-  let promise = new Promise()
+  let promise = new Promise((resolve, reject) => {
+    console.log('connecting...')
+    pg.connect(DB_URL, function (err, client) {
+      console.log('connect callback')
+      if (err) {
+        console.error('Failed to connect to postgres: ', err)
+        reject(err)
+      }
 
-  // consult the map
+      var queryString = 'SELECT * FROM user_locations WHERE username = \'' + username + '\';'
 
-  /** pg.connect(DB_URL, function (err, client) {
-    if (err) {
-      console.error('Failed to connect to postgres: ', err)
-      promise.reject(err)
-    }
-
-    var queryString = 'SELECT * FROM user_locations WHERE username = \'' + username + '\');'
-
-    client
-      .query(queryString, function (err, result) {
-        if (err) {
-          console.error('Error querying database: ', err)
-          promise.reject(err)
-        } else {
-          console.log(queryString)
-          console.log(result.rows)
-          promise.resolve(result.rows || false)
-        }
-      })
+      client
+        .query(queryString, function (err, result) {
+          if (err) {
+            console.error('Error querying database: ', err)
+            reject(err)
+          } else {
+            console.log(queryString)
+            console.log(result.rows)
+            resolve(result.rows || false)
+          }
+        })
+    })
   }) */
   return promise
 }
