@@ -70,8 +70,104 @@ function whereis (input) {
 /**
  * @param location {office, floor, seat}
  */
-whereis.updateUser = function updateUser (userId, location) {
-  console.log('TODO add update user functionality')
+whereis.updateUser = function updateUser (username, location) {
+  console.log('update user functionality')
+
+  // insert on user just in case, on conflict do nothing
+  console.log('connecting for insert...')
+  pg.connect(DB_URL, function (err, client) {
+    console.log('connect callback')
+    if (err) {
+      console.error('Failed to connect to postgres: ', err)
+    }
+
+    var queryString = `INSERT INTO user_locations (username)
+                        VALUES ('${username}')
+                        ON CONFLICT DO NOTHING`
+
+    client
+      .query(queryString, function (err, result) {
+        if (err) {
+          console.error('Error updating database: ', err)
+        } else {
+          console.log(queryString)
+          updateOtherInfoOnceUserCreated(username, location)   // do the rest
+        }
+      })
+  })
+}
+
+function updateOtherInfoOnceUserCreated (username, location) {
+  var office = location.office
+  var floor = location.floor
+  var seat = location.seat
+
+  if (office) {
+    console.log('connecting for office...')
+    pg.connect(DB_URL, function (err, client) {
+      console.log('connect callback')
+      if (err) {
+        console.error('Failed to connect to postgres: ', err)
+      }
+
+      var queryString = `UPDATE user_locations
+                        SET office = '${office}'
+                        WHERE username = '${username}' `
+
+      client
+      .query(queryString, function (err, result) {
+        if (err) {
+          console.error('Error updating database: ', err)
+        } else {
+          console.log(queryString)
+        }
+      })
+    })
+  }
+  if (floor) {
+    console.log('connecting for floor...')
+    pg.connect(DB_URL, function (err, client) {
+      console.log('connect callback')
+      if (err) {
+        console.error('Failed to connect to postgres: ', err)
+      }
+
+      var queryString = `UPDATE user_locations
+                        SET floor = '${floor}'
+                        WHERE username = '${username}' `
+
+      client
+      .query(queryString, function (err, result) {
+        if (err) {
+          console.error('Error updating database: ', err)
+        } else {
+          console.log(queryString)
+        }
+      })
+    })
+  }
+  if (seat) {
+    console.log('connecting for seat...')
+    pg.connect(DB_URL, function (err, client) {
+      console.log('connect callback')
+      if (err) {
+        console.error('Failed to connect to postgres: ', err)
+      }
+
+      var queryString = `UPDATE user_locations
+                        SET seat = '${seat}'
+                        WHERE username = '${username}' `
+
+      client
+      .query(queryString, function (err, result) {
+        if (err) {
+          console.error('Error updating database: ', err)
+        } else {
+          console.log(queryString)
+        }
+      })
+    })
+  }
 }
 
 // Check for an invalid Slack username
