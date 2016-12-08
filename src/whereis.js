@@ -88,28 +88,29 @@ function slackUserExists (username) {
 }
 
 function dbUserExists (username) {
-  let promise = new Promise()
-  console.log('connecting...')
-  pg.connect(DB_URL, function (err, client) {
-    console.log('connect callback')
-    if (err) {
-      console.error('Failed to connect to postgres: ', err)
-      promise.reject(err)
-    }
+  let promise = new Promise(() => {
+    console.log('connecting...')
+    pg.connect(DB_URL, function (err, client) {
+      console.log('connect callback')
+      if (err) {
+        console.error('Failed to connect to postgres: ', err)
+        promise.reject(err)
+      }
 
-    var queryString = 'SELECT * FROM user_locations WHERE username = \'' + username + '\');'
+      var queryString = 'SELECT * FROM user_locations WHERE username = \'' + username + '\');'
 
-    client
-      .query(queryString, function (err, result) {
-        if (err) {
-          console.error('Error querying database: ', err)
-          promise.reject(err)
-        } else {
-          console.log(queryString)
-          console.log(result.rows)
-          promise.resolve(result.rows || false)
-        }
-      })
+      client
+        .query(queryString, function (err, result) {
+          if (err) {
+            console.error('Error querying database: ', err)
+            promise.reject(err)
+          } else {
+            console.log(queryString)
+            console.log(result.rows)
+            promise.resolve(result.rows || false)
+          }
+        })
+    })
   })
   return promise
 }
