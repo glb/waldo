@@ -64,6 +64,7 @@ rtmClient.message(message => {
       let index = command.indexOf('@' + botUser.id) + ('@' + botUser.id).length
       command = command.substring(index)
     }
+    console.log(`command: ${command}`)
 
     // whereis
     let matches = command.match(/\bwhere\s?is\s+<@(\S+)>/)
