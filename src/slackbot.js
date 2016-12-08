@@ -53,6 +53,10 @@ rtmClient.message(message => {
     // TODO add @mention when functionality is more complete
     // message.text.indexOf('@' + botUser.id) > -1 ||
 
+    if (!message.text) {
+      console.error('ERROR weird message:', message)
+      return
+    }
     let matches = message.text.match(/where\s?is\s+<@(\S+)>/)
     if (matches !== null) {
       let userId = matches[1]
