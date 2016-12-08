@@ -5,48 +5,99 @@ if (!SLACK_BOT_TOKEN) {
   process.exit(1)
 }
 
-var Bot = require('slackbots')
+var slack = require('slack-promise')
 
-var settings = {
-  token: SLACK_BOT_TOKEN,
-  name: 'Waldo'
-}
-var bot = new Bot(settings)
-bot.on('start', function () {
-  bot.user = bot.users.filter(function (user) {
-    return user.name.toLowerCase() === 'waldo'
-  })[0]
-  if (!bot.user) {
-    console.error('ERROR: bot could not find it\'s own user id')
-    process.exit(1)
-  }
+var rtmClient = slack.rtm.client()
+var token = SLACK_BOT_TOKEN
 
-  bot.postMessageToUser('morganw', 'Waldo reporting for duty!', {'as_user': 'true'})
-  bot.postMessageToUser('grahamm', 'Waldo reporting for duty!', {'as_user': 'true'})
-  console.log('Started...')
-})
-bot.on('message', function (message) {
-  if (message.type !== 'message') {
-    return
-  }
-  if (message.user === bot.user.id ||
-        message.text.indexOf('@' + bot.user.id) === -1) {
-    console.log('skipping message')
-    return
-  }
-  console.log('ok to reply')
-  bot.getUser(message.user)
-    .then(function (res) {
-      console.log(res)
+var users, botUser
+
+rtmClient.started(() => {
+  refreshUserList()
+    .then(() => {
+      botUser = users['waldo']
+
+      if (!botUser) {
+        console.error('ERROR: bot could not find it\'s own user id')
+        process.exit(1)
+      }
+
+      slack.mpim.open({
+        token,
+        users: [users['grahamm'].id, users['morganw'].id].join(',')
+      })
+      .then(res => {
+        postMessage({
+          channel: res.group.id,
+          text: 'Waldo reporting for duty!'
+        })
+      })
+      .catch(err => {
+        console.error('Couldn\'t open instant message', err)
+      })
+
+      console.log('Started...')
     })
-  replyToMessage(message, "I'M ALIVE")
 })
 
-function replyToMessage (message, response) {
-  if (message.channel[0] === 'D') {
-    bot.postMessageToUser(message.user, response)
-  } else {
-    bot.postMessageToChannel(message.channel, response)
+rtmClient.message(message => {
+  // only want to monitor chat messages, and waldo should ignore his own messages
+  if (message.type !== 'message' || message.user === botUser.id) {
+    return
   }
+  // if waldo is mentioned, or direct messaged, reply
+  if (message.channel[0] === 'D') {
+    // TODO add @mention when functionality is more complete
+    // message.text.indexOf('@' + botUser.id) > -1 ||
+
+    postMessage({
+      channel: message.channel,
+      text: `You said "${message.text}"`
+    })
+  }
+})
+
+function refreshUserList () {
+  console.log('refreshing user list')
+  return slack.users.list({token})
+    .then(res => {
+      users = res.members.reduce((map, member) => {
+        map[member.name] = member
+        return map
+      }, {})
+      return users
+    })
+    .catch(res => {
+      console.error('Failed to update user list')
+      console.error(res)
+      return []
+    })
 }
 
+function getUser (username) {
+  var promise
+
+  if (!users[username]) {
+    // if we don't know about the user, refresh the list
+    return refreshUserList().then(userList => {
+      if (!users[username]) {
+        console.error("Couldn't find info for user named:" + username)
+      }
+      return userList[username]
+    })
+  } else {
+    promise = new Promise().resolve(users[username])
+  }
+  return promise
+}
+
+function postMessage (config) {
+  config.token = token
+  config.as_user = 'waldo'
+  return slack.chat.postMessage(config)
+    .catch(err => {
+      console.error('Couldn\'t send message', err)
+    })
+}
+
+rtmClient.listen({token})
