@@ -37,6 +37,16 @@ app.route('/whereis')
     res.json(response)
   })
 
+app.route('/map/:mapId')
+  .get((req, res) => {
+    let mapId = req.params.mapId
+    if (mapId === '20k') {
+      return res.sendFile('../assets/20k-under-sea-with-waldo.jpg')
+    } else {
+      return 'Sorry map not found'
+    }
+  })
+
 app.listen(PORT, function (err) {
   if (err) {
     return console.error('Error starting server: ', err)

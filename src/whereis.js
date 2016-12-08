@@ -21,7 +21,7 @@ function whereis (input) {
   } else if (slackUserExists(user)) {      // Check if user exists in Slack (aka SQL sanitize)
     // Check for user location
     if (user === '@waldo') {               // Easter egg: @waldo
-      message = '@waldo is 20000 leagues under the sea!'
+      message = `@waldo is 20000 leagues under the sea! http://floating-reef-60921.herokuapp.com/map/20k`
     } else if (userRow = dbUserExists(user)) {       // Check if user exists in db location table
       // get user location for msg
       // location = getLocation(user)
