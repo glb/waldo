@@ -108,7 +108,11 @@ function dbUserExists (username) {
           } else {
             console.log(queryString)
             console.log(result.rows)
-            resolve(result.rows || false)
+            if (result.rows && result.rows.length > 0) {
+              resolve(result.rows[0])
+            } else {
+              resolve(false)
+            }
           }
         })
     })
