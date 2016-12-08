@@ -17,9 +17,9 @@ if (!PORT) {
 
 var app = express()
 
-console.log('path: ' + path.resolve('../assets'))
+console.log('path: ' + path.resolve(__dirname, '../assets'))
 
-app.use('/static', express.static(path.resolve('../assets')))
+app.use('/static', express.static(path.resolve(__dirname, '../assets')))
 
 app.route('/whereis')
   .get(function (req, res) {
