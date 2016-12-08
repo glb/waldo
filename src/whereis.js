@@ -3,46 +3,53 @@ var pg = require('pg')
 var DB_URL = process.env.DATABASE_URL
 pg.defaults.ssl = true
 
+var userList = new UserList(process.env.SLACK_BOT_TOKEN)
 /**
  * Returns the location of a user's desk or an error message
  */
 function whereis (input) {
   // clean up input
-  var user = input.split(' ')[0]    // take first word
-  if (user.indexOf('?') > -1) {     // remove potential trailing question mark (ie: /whereis @waldo?)
-    user = user.substring(0, user.indexOf('?'))
+  var username = input.split(' ')[0]    // take first word
+  if (username.indexOf('?') > -1) {     // remove potential trailing question mark (ie: /whereis @waldo?)
+    username = username.substring(0, username.indexOf('?'))
   }
 
   var message
   var userRow
 
-  if (invalidSlackUsername(user)) {        // Check for invalid Slack username
-    message = `'${user}' doesn't look like a valid Slack username!`
-  } else {
+  if (invalidSlackUsername(username)) {        // Check for invalid Slack username
+    return Promise.resolve({text: `'${username}' doesn't look like a valid Slack username!`})
+  }
+
     // Check if user exists in Slack (+SQL sanitize)
-    slackUserExists(user).then(user => {
+  return slackUserExists(username.substring(1))
+    .then(user => {
       if (user) {
         // Check for user location
-        if (user === '@waldo') {                        // Easter egg: @waldo
+        if (user.name === 'waldo') {               // Easter egg: @waldo
           message = `@waldo is 20000 leagues under the sea! http://floating-reef-60921.herokuapp.com/map/20k`
-        } else if ((userRow = dbUserExists(user)) === true) {      // Check if user exists in db location table
-          message = user + ' location:\n' + printLocation(userRow)
-        } else {                                        // Return suggestion to talk to @waldo to add location
-          message = `I don't know where ${user} is.  If you find out, please tell me! (@waldo)`
+        } else {
+          return dbUserExists(username)
+            .then(userRow => {
+              if (userRow) {
+                message = username + ' location:\n' + printLocation(userRow)
+              } else {                               // Return suggestion to talk to @waldo to add location
+                message = `I don't know where ${username} is.  If you find out, please tell me! (@waldo)`
+              }
+              return {text: message}
+            })
+            .catch(() => {
+              return {text: 'DB Error'}
+            })
         }
-      } else {                                          // Return error bc user does not exist in Slack
-        message = `Hmm... ${user} doesn't seem to be a current Slack user!`
+      } else {                                  // Return error bc user does not exist in Slack
+        message = `Hmm... ${username} doesn't seem to be a current Slack user!`
       }
+
+      // TODO: add attachment image based on office and floor if one exists
+      // attachment : getFloorImage(location)
+      return {text: message}
     })
-  }
-
-  var response = {
-    text: message
-    // TODO: add attachment image based on office and floor if one exists
-    // attachment : getFloorImage(location)
-  }
-
-  return response
 }
 
 /**
@@ -63,26 +70,28 @@ function invalidSlackUsername (username) {
 
 // Check if the user exists in Slack
 function slackUserExists (username) {
-  return UserList.getUser(username)   // returns undefined=false if user does not exist
+  return userList.getUser(username)   // returns undefined=false if user does not exist
 }
 
 function dbUserExists (username) {
-  let userInfo = false
+  let promise = new Promise()
   pg.connect(DB_URL, function (err, client) {
     if (err) {
-      console.log('Failed to connect to postgres: ' + err)
+      console.error('Failed to connect to postgres: ', err)
+      promise.reject(err)
     }
 
     client
       .query('SELECT * FROM user_locations WHERE username = \'' + username + '\');', function (err, result) {
         if (err) {
-          console.log('Error querying database: ' + err)
+          console.error('Error querying database: ', err)
+          promise.reject(err)
         } else {
-          userInfo = result.rows
+          promise.resolve(result.rows)
         }
       })
   })
-  return userInfo
+  return promise
 }
 
 function printLocation (loc) {

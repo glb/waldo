@@ -29,12 +29,13 @@ app.route('/whereis')
     var input = req.body.text
 
     if (input === 'help') {     // Handle any help requests
-      response = help.whereis()
+      res.json(help.whereis())
     } else {                    // Lookup user location
-      response = whereis(input)
+      whereis(input)
+        .then(response => {
+          res.json(response)
+        })
     }
-
-    res.json(response)
   })
 
 app.route('/map/:mapId')

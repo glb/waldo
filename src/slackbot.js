@@ -68,9 +68,11 @@ rtmClient.message(message => {
       let userId = matches[1]
       userList.getUser(userId)
         .then(user => {
-          let response = whereis('@' + user.name)
+          return whereis('@' + user.name)
+        })
+        .then(response => {
           response.channel = message.channel
-          postMessage(response)
+          return postMessage(response)
         })
       return
     }
