@@ -46,7 +46,7 @@ rtmClient.started(() => {
 
 rtmClient.message(message => {
   // only want to monitor chat messages, and waldo should ignore his own messages
-  if (message.type !== 'message' || message.user === botUser.id) {
+  if (message.type !== 'message' || !botUser || message.user === botUser.id) {
     return
   }
   // if waldo is mentioned, or direct messaged, reply

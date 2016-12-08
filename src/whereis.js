@@ -61,6 +61,9 @@ function whereis (input) {
       // attachment : getFloorImage(location)
       return {text: message}
     })
+    .catch(reason => {
+      console.error('Failed in whereis', reason)
+    })
 }
 
 /**
