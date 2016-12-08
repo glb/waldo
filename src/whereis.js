@@ -42,6 +42,13 @@ function whereis (input) {
   return response
 }
 
+/**
+ * @param location {office, floor, seat}
+ */
+whereis.updateUser = function updateUser (userId, location) {
+  console.log('TODO add update user functionality')
+}
+
 // Check for an invalid Slack username
 function invalidSlackUsername (username) {
   // Dec 7 2016:
