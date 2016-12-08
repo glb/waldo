@@ -36,25 +36,26 @@ function whereis (input) {
             ]
           }
         } else {
-          return dbUserExists(username)
+          dbUserExists(username)
             .then(userRow => {
               if (userRow) {
                 message = username + ' location:\n' + printLocation(userRow)
               } else {                               // Return suggestion to talk to @waldo to add location
                 message = `I don't know where ${username} is.  If you find out, please tell me! (@waldo)`
               }
-              return {text: message}
+              return {
+                text: message
+                // attachment : getFloorImage(location)
+              }
             })
             .catch(() => {
-              return {text: 'DB Error'}
+              return {text: `Hmm... something went wrong with my database when searching for ${username}`}
             })
         }
       } else {                                  // Return error bc user does not exist in Slack
         message = `Hmm... ${username} doesn't seem to be a current Slack user!`
       }
 
-      // TODO: add attachment image based on office and floor if one exists
-      // attachment : getFloorImage(location)
       return {text: message}
     })
 }
@@ -82,7 +83,10 @@ function slackUserExists (username) {
 
 function dbUserExists (username) {
   let promise = new Promise()
-  pg.connect(DB_URL, function (err, client) {
+
+  // consult the map
+
+  /** pg.connect(DB_URL, function (err, client) {
     if (err) {
       console.error('Failed to connect to postgres: ', err)
       promise.reject(err)
@@ -101,7 +105,7 @@ function dbUserExists (username) {
           promise.resolve(result.rows || false)
         }
       })
-  })
+  }) */
   return promise
 }
 
