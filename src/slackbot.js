@@ -60,27 +60,71 @@ rtmClient.message(message => {
     }
     console.log(`user messaged me: "${message.text}"`)
 
-    let matches = message.text.match(/\bwhere\s?is\s+<@(\S+)>/)
+    let command = message.text
+
+    // whereis
+    let matches = command.match(/\bwhere\s?is\s+<@(\S+)>/)
     if (matches !== null) {
       let userId = matches[1]
       userList.getUser(userId)
         .then(user => {
-          postMessage({
-            channel: message.channel,
-            text: whereis('@' + user.name).text
-          })
+          let response = whereis('@' + user.name)
+          response.channel = message.channel
+          postMessage(response)
         })
+      return
     }
 
     // TODO better parsing
-    if (/\bhelp\b|(\bhow do i)/.test(message.text.toLowerCase())) {
+    if (/\bhelp\b|(\bhow do i)/.test(command.toLowerCase())) {
       postMessage({
         channel: message.channel,
         text: help().text
       })
+      return
+    }
+
+    // Update location
+    let update = parseLocationData(command)
+    if (update) {
+      whereis.updateUser(update.userId, update.location)
+      postMessage({
+        channel: message.channel,
+        text: 'Updated!'
+      })
+      return
     }
   }
 })
+
+function parseLocationData (input) {
+  let location = {}
+  let matches
+  let userId = null
+
+  // update office
+  matches = input.match(/<@(\S+)>.*\b(\w+)\s+office/)
+  if (matches !== null) {
+    userId = matches[1]
+    location.office = matches[2]
+  }
+
+  // update floor
+  matches = input.match(/<@(\S+)>.*\b([0-9]\w*)\s+floor/) || input.match(/<@(\S+)>.*\bfloor\s+([0-9]\w*)/)
+  if (matches !== null) {
+    userId = matches[1]
+    location.floor = matches[2]
+  }
+
+  // update seat
+  matches = input.match(/<@(\S+)>.*seat\s+([0-9]+)/)
+  if (matches !== null) {
+    userId = matches[1]
+    location.seat = matches[2]
+  }
+
+  return (userId) ? {userId, location} : null
+}
 
 function postMessage (config) {
   config.token = token
