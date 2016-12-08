@@ -7,15 +7,16 @@ if (!SLACK_BOT_TOKEN) {
 
 var slack = require('slack-promise')
 var whereis = require('./whereis.js')
+var UserList = require('./user_list.js')
 
 var rtmClient = slack.rtm.client()
 var token = SLACK_BOT_TOKEN
-
-var users, botUser
+var userList = new UserList(token)
+var botUser
 
 rtmClient.started(() => {
-  refreshUserList()
-    .then(() => {
+  userList.getUsers()
+    .then(users => {
       botUser = users['waldo']
 
       if (!botUser) {
@@ -23,6 +24,7 @@ rtmClient.started(() => {
         process.exit(1)
       }
 
+      // let people know bot is online
       slack.mpim.open({
         token,
         users: [users['grahamm'].id, users['morganw'].id].join(',')
@@ -54,7 +56,7 @@ rtmClient.message(message => {
     let matches = message.text.match(/where\s?is\s+<@(\S+)>/)
     if (matches !== null) {
       let userId = matches[1]
-      getUserById(userId)
+      userList.getUser(userId)
         .then(user => {
           postMessage({
             channel: message.channel,
@@ -66,63 +68,6 @@ rtmClient.message(message => {
     console.log(`user messaged me: "${message.text}"`)
   }
 })
-
-function refreshUserList () {
-  console.log('refreshing user list')
-  var newUserMap = {}
-  return slack.users.list({token})
-    .then(res => {
-      users = res.members.reduce((map, member) => {
-        map[member.name] = member
-        newUserMap[member.id] = member.name
-        return map
-      }, {})
-      _userMap = newUserMap
-      return users
-    })
-    .catch(res => {
-      console.error('Failed to update user list')
-      console.error(res)
-      return []
-    })
-}
-
-function getUser (username) {
-  var promise
-
-  if (!users[username]) {
-    // if we don't know about the user, refresh the list
-    return refreshUserList().then(_ => {
-      if (!users[username]) {
-        console.error("Couldn't find info for user named:" + username)
-      }
-      return users[username]
-    })
-  } else {
-    promise = Promise.resolve(users[username])
-  }
-  return promise
-}
-
-var _userMap
-function getUserById (userId) {
-  var promise
-
-  if (!_userMap[userId]) {
-    // if we don't know about the user, refresh the list
-    return refreshUserList().then(_ => {
-      if (!_userMap[userId]) {
-        console.error("Couldn't find info for user with id:" + userId)
-      } else {
-        return users[_userMap[userId]]
-      }
-    })
-  } else {
-    var value = users[_userMap[userId]]
-    promise = Promise.resolve(value)
-  }
-  return promise
-}
 
 function postMessage (config) {
   config.token = token
