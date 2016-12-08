@@ -62,7 +62,7 @@ rtmClient.message(message => {
     // if @mentioned trim the command
     if (command.indexOf('@' + botUser.id) > -1) {
       let index = command.indexOf('@' + botUser.id) + ('@' + botUser.id).length
-      command.substring(index)
+      command = command.substring(index)
     }
 
     // whereis
