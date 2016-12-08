@@ -24,6 +24,7 @@ function whereis (input) {
   return slackUserExists(username.substring(1))
     .then(user => {
       if (user) {
+        console.log(` exists: ${user.name}`)
         // Check for user location
         if (user.name === 'waldo') {               // Easter egg: @waldo
           return {
@@ -38,6 +39,7 @@ function whereis (input) {
         } else {
           return dbUserExists(username)
             .then(userRow => {
+              console.log(`got db result`)
               if (userRow) {
                 message = username + ' location:\n' + printLocation(userRow)
               } else {                               // Return suggestion to talk to @waldo to add location
@@ -50,6 +52,7 @@ function whereis (input) {
             })
         }
       } else {                                  // Return error bc user does not exist in Slack
+        console.log(`does not exist: ${username}`)
         message = `Hmm... ${username} doesn't seem to be a current Slack user!`
       }
 
