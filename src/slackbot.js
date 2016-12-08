@@ -89,11 +89,14 @@ rtmClient.message(message => {
     // Update location
     let update = parseLocationData(command)
     if (update) {
-      whereis.updateUser(update.userId, update.location)
-      postMessage({
-        channel: message.channel,
-        text: 'Updated!'
-      })
+      userList.getUser(update.userId)
+        .then(user => {
+          whereis.updateUser(user.name, update.location)
+          postMessage({
+            channel: message.channel,
+            text: 'Updated!'
+          })
+        })
       return
     }
   }
