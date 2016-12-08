@@ -99,6 +99,20 @@ rtmClient.message(message => {
         })
       return
     }
+
+    if (/show me a map/.test(command.toLowerCase())) {
+      postMessage({
+        channel: message.channel,
+        text: 'Map of the Ottawa 4th Floor',
+        attachments: [
+          {
+            fallback: 'http://floating-reef-60921.herokuapp.com/map/ottawa-4th',
+            image_url: 'http://floating-reef-60921.herokuapp.com/map/ottawa-4th'
+          }
+        ]
+      })
+      return
+    }
   }
 })
 
