@@ -1,3 +1,4 @@
+var path = require('express')
 var express = require('express')
 var bodyParser = require('body-parser')
 var whereis = require('./whereis.js')
@@ -16,7 +17,9 @@ if (!PORT) {
 
 var app = express()
 
-app.use('/static', express.static('../assets'))
+console.log('path: ' + path.resolve('../assets'))
+
+app.use('/static', express.static(path.resolve('../assets')))
 
 app.route('/whereis')
   .get(function (req, res) {
@@ -44,7 +47,7 @@ app.route('/map/:mapId')
   .get((req, res) => {
     let mapId = req.params.mapId
     if (mapId === '20k') {
-      res.redirect('static/20k-under-sea-with-waldo.jpg')
+      res.redirect('/static/20k-under-sea-with-waldo.jpg')
     } else {
       res.sendStatus(404)
     }
