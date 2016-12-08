@@ -6,6 +6,7 @@ if (!SLACK_BOT_TOKEN) {
 }
 
 var slack = require('slack-promise')
+var whereis = require('./whereis.js')
 
 var rtmClient = slack.rtm.client()
 var token = SLACK_BOT_TOKEN
@@ -50,21 +51,33 @@ rtmClient.message(message => {
     // TODO add @mention when functionality is more complete
     // message.text.indexOf('@' + botUser.id) > -1 ||
 
-    postMessage({
-      channel: message.channel,
-      text: `You said "${message.text}"`
-    })
+    let matches = message.text.match(/where\s?is\s+<@(\S+)>/)
+    if (matches !== null) {
+      let userId = matches[1]
+      getUserById(userId)
+        .then(user => {
+          postMessage({
+            channel: message.channel,
+            text: whereis('@' + user.name).text
+          })
+        })
+    }
+
+    console.log(`user messaged me: "${message.text}"`)
   }
 })
 
 function refreshUserList () {
   console.log('refreshing user list')
+  var newUserMap = {}
   return slack.users.list({token})
     .then(res => {
       users = res.members.reduce((map, member) => {
         map[member.name] = member
+        newUserMap[member.id] = member.name
         return map
       }, {})
+      _userMap = newUserMap
       return users
     })
     .catch(res => {
@@ -79,14 +92,34 @@ function getUser (username) {
 
   if (!users[username]) {
     // if we don't know about the user, refresh the list
-    return refreshUserList().then(userList => {
+    return refreshUserList().then(_ => {
       if (!users[username]) {
         console.error("Couldn't find info for user named:" + username)
       }
-      return userList[username]
+      return users[username]
     })
   } else {
-    promise = new Promise().resolve(users[username])
+    promise = Promise.resolve(users[username])
+  }
+  return promise
+}
+
+var _userMap
+function getUserById (userId) {
+  var promise
+
+  if (!_userMap[userId]) {
+    // if we don't know about the user, refresh the list
+    return refreshUserList().then(_ => {
+      if (!_userMap[userId]) {
+        console.error("Couldn't find info for user with id:" + userId)
+      } else {
+        return users[_userMap[userId]]
+      }
+    })
+  } else {
+    var value = users[_userMap[userId]]
+    promise = Promise.resolve(value)
   }
   return promise
 }

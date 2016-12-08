@@ -28,7 +28,7 @@ function whereis (input) {
       responseType = 'in_channel'
       message = user + ' is ???'        // get user location for msg
     } else {                                // Return suggestion to talk to @waldo to add location
-      message = `I don't know where ${user} is.  If you find out, please tell me(@waldo)!`
+      message = `I don't know where ${user} is.  If you find out, please tell me! (@waldo)`
     }
   } else {                                  // Return error bc user does not exist in Slack
     message = `Hmm... ${user} doesn't seem to be a current Slack user!`

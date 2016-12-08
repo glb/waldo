@@ -1,6 +1,6 @@
 var express = require('express')
 var bodyParser = require('body-parser')
-var whereis = require('./whereis_lookup.js')
+var whereis = require('./whereis.js')
 var help = require('./help.js')
 
 var VERIFY_TOKEN = process.env.SLACK_VERIFY_TOKEN
