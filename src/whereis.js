@@ -1,5 +1,5 @@
 var UserList = require('./user_list.js')
-var pg = require('pg');
+var pg = require('pg')
 var DB_URL = process.env.DATABASE_URL
 pg.defaults.ssl = true
 
@@ -64,7 +64,7 @@ function slackUserExists (username) {
 }
 
 function dbUserExists (username) {
-  userInfo = false;
+  let userInfo = false
   pg.connect(DB_URL, function (err, client) {
     if (err) {
       console.log('Failed to connect to postgres: ' + err)
@@ -79,6 +79,7 @@ function dbUserExists (username) {
           userInfo = result.rows
         }
       })
+  })
 
   return userInfo
 }
