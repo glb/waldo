@@ -45,9 +45,11 @@ app.route('/whereis')
 
 app.route('/map/:mapId')
   .get((req, res) => {
-    let mapId = req.params.mapId
+    let mapId = req.params.mapId.toLowerCase()
     if (mapId === '20k') {
       res.redirect('/static/20k-under-sea-with-waldo.jpg')
+    } else if (mapId.indexOf('ottawa') > -1) {
+      res.redirect(`/static/maps/ottawa-4th.png`)
     } else {
       res.redirect(`/static/maps/${mapId}.png`)
     }

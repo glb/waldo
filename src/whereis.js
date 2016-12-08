@@ -42,13 +42,21 @@ function whereis (input) {
             .then(userRow => {
               console.log(`got db result`)
               if (userRow) {
-                message = username + ' location:\n' + printLocation(userRow)
+                let result = {
+                  text: username + ' location:\n' + printLocation(userRow)
+                }
+                if (userRow.office && userRow.floor) {
+                  let imgUrl = `http://floating-reef-60921.herokuapp.com/map/${userRow.office}-${userRow.floor}`
+                  result.attachments = [
+                    {
+                      fallback: imgUrl,
+                      image_url: imgUrl
+                    }
+                  ]
+                }
+                return result
               } else {                               // Return suggestion to talk to @waldo to add location
-                message = `I don't know where ${username} is.  If you find out, please tell me! (@waldo)`
-              }
-              return {
-                text: message
-                // attachment : getFloorImage(location)
+                return {text: `I don't know where ${username} is.  If you find out, please tell me! (@waldo)`}
               }
             })
             .catch(() => {
