@@ -25,7 +25,7 @@ function whereis (input) {
     } else if (userRow = dbUserExists(user)) {       // Check if user exists in db location table
       // get user location for msg
       // location = getLocation(user)
-      message = user + ''s desk is:' // + parselocation(location)
+      message = user + `'s desk is:` // + parselocation(location)
     } else {                               // Return suggestion to talk to @waldo to add location
       message = `I don't know where ${user} is.  If you find out, please tell me! (@waldo)`
     }
