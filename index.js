@@ -23,18 +23,6 @@ pg.connect(DB_URL, function (err, client) {
         console.log('User location table exists or was created')
       }
     })
-
-    client
-      .query('SELECT * FROM user_locations);', function (err, result) {
-        if (err) {
-          console.error('Error querying database: ', err)
-        } else {
-          console.log(result.rows)
-          // map = result.rows
-          // console.log(map)
-        }
-      })
-  })
 })
 
 // Setup slack bot
