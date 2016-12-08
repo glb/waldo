@@ -15,9 +15,8 @@ function whereis (input) {
   }
 
   var message
-  var userRow
 
-  if (invalidSlackUsername(username)) {        // Check for invalid Slack username
+  if (invalidSlackUsername(username)) {
     return Promise.resolve({text: `'${username}' doesn't look like a valid Slack username!`})
   }
 
@@ -81,12 +80,16 @@ function dbUserExists (username) {
       promise.reject(err)
     }
 
+    var queryString = 'SELECT * FROM user_locations WHERE username = \'' + username + '\');'
+
     client
-      .query('SELECT * FROM user_locations WHERE username = \'' + username + '\');', function (err, result) {
+      .query(queryString, function (err, result) {
         if (err) {
           console.error('Error querying database: ', err)
           promise.reject(err)
         } else {
+          console.log(queryString)
+          console.log(result.rows)
           promise.resolve(result.rows)
         }
       })
