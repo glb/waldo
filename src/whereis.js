@@ -26,7 +26,15 @@ function whereis (input) {
       if (user) {
         // Check for user location
         if (user.name === 'waldo') {               // Easter egg: @waldo
-          message = `@waldo is 20000 leagues under the sea! http://floating-reef-60921.herokuapp.com/map/20k`
+          return {
+            text: `@waldo is 20000 leagues under the sea!`,
+            attachments: [
+              {
+                fallback: 'http://floating-reef-60921.herokuapp.com/map/20k',
+                image_url: 'http://floating-reef-60921.herokuapp.com/map/20k'
+              }
+            ]
+          }
         } else {
           return dbUserExists(username)
             .then(userRow => {

@@ -42,7 +42,7 @@ app.route('/map/:mapId')
   .get((req, res) => {
     let mapId = req.params.mapId
     if (mapId === '20k') {
-      return res.sendFile('../assets/20k-under-sea-with-waldo.jpg')
+      res.sendFile('../assets/20k-under-sea-with-waldo.jpg', { root: __dirname })
     } else {
       return 'Sorry map not found'
     }
