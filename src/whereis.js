@@ -37,6 +37,7 @@ function whereis (input) {
             ]
           }
         } else {
+          console.log('before call db method')
           return dbUserExists(username)
             .then(userRow => {
               console.log(`got db result`)
