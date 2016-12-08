@@ -41,6 +41,7 @@ class UserList {
   }
 
   // TODO maybe accept a comma delimited list
+
   getUsers () {
     return this._refresh().then(() => { return this.users })
   }

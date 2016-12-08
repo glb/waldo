@@ -11,10 +11,11 @@ pg.connect(DB_URL, function (err, client) {
 
   client
     .query(`CREATE TABLE IF NOT EXISTS user_locations (
-      username    varchar(22) PRIMARY KEY,
-      office      varchar,
-      floor       varchar,
-      seat        integer
+      username      varchar(22) PRIMARY KEY,
+      office        varchar,
+      floor         varchar,
+      seat          integer,
+      lastUpdated   timestamp DEFAULT now()
     ); `, function (err, result) {
       if (err) {
         console.log('Error querying database: ' + err)

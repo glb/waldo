@@ -1,33 +1,32 @@
+var UserList = require('./user_list.js')
+var pg = require('pg');
+var DB_URL = process.env.DATABASE_URL
+pg.defaults.ssl = true
 
 /**
  * Returns the location of a user's desk or an error message
  */
 function whereis (input) {
-  var user = input.split(' ')[0]
-  // user may have asked this with a question mark (Example: /whereis @waldo?)
-  if (user.indexOf('?') > -1) {
+  // clean up input
+  var user = input.split(' ')[0]    // take first word
+  if (user.indexOf('?') > -1) {     // remove potential trailing question mark (ie: /whereis @waldo?)
     user = user.substring(0, user.indexOf('?'))
   }
-  // TODO move responseType property to slash command?
-  var responseType = 'ephemeral'  // default used for all error message responses
+
   var message
+  var location
 
   if (invalidSlackUsername(user)) {        // Check for invalid Slack username
     message = `'${user}' doesn't look like a valid Slack username!`
-  } else if (slackUserExists(user)) {                        // Check if user exists in Slack
-    // Easter egg: @glb
-    if (user === '@glb') {
-      // TODO: call Waldo bot to message with /shrug and make sure actual location also given
-    }
-
+  } else if (slackUserExists(user)) {      // Check if user exists in Slack (aka SQL sanitize)
     // Check for user location
-    if (user === '@waldo') {                // Easter egg: @waldo
-      responseType = 'in_channel'
+    if (user === '@waldo') {               // Easter egg: @waldo
       message = '@waldo is 20000 leagues under the sea!'
-    } else if (false) {                 // Check if user exists in db location table
-      responseType = 'in_channel'
-      message = user + ' is ???'        // get user location for msg
-    } else {                                // Return suggestion to talk to @waldo to add location
+    } else if (userRow = dbUserExists(user)) {       // Check if user exists in db location table
+      // get user location for msg
+      // location = getLocation(user)
+      message = user + ''s desk is:' // + parselocation(location)
+    } else {                               // Return suggestion to talk to @waldo to add location
       message = `I don't know where ${user} is.  If you find out, please tell me! (@waldo)`
     }
   } else {                                  // Return error bc user does not exist in Slack
@@ -35,8 +34,9 @@ function whereis (input) {
   }
 
   var response = {
-    response_type: responseType,
     text: message
+    // TODO: add attachment image based on office and floor if one exists
+    // attachment : getFloorImage(location)
   }
 
   return response
@@ -53,7 +53,27 @@ function invalidSlackUsername (username) {
 
 // Check if the user exists in Slack
 function slackUserExists (username) {
-  return true // TODO: use what graham wrote when it's done
+  return UserList.getUser(username)   // returns undefined=false if user does not exist
+}
+
+function dbUserExists (username) {
+  userInfo = false;
+  pg.connect(DB_URL, function (err, client) {
+    if (err) {
+      console.log('Failed to connect to postgres: ' + err)
+    }
+
+    client
+      .query('SELECT * FROM user_locations WHERE username = \'' + username + '\');', function (err, result) {
+        if (err) {
+          console.log('Error querying database: ' + err)
+        } else {
+          console.log(result.rows)
+          userInfo = result.rows
+        }
+      })
+
+  return userInfo
 }
 
 module.exports = whereis
