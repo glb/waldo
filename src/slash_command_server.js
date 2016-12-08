@@ -16,6 +16,8 @@ if (!PORT) {
 
 var app = express()
 
+app.use('/static', express.static('../assets'))
+
 app.route('/whereis')
   .get(function (req, res) {
     res.sendStatus(200)
@@ -42,9 +44,9 @@ app.route('/map/:mapId')
   .get((req, res) => {
     let mapId = req.params.mapId
     if (mapId === '20k') {
-      res.sendFile('../assets/20k-under-sea-with-waldo.jpg', { root: __dirname })
+      res.redirect('static/20k-under-sea-with-waldo.jpg')
     } else {
-      return 'Sorry map not found'
+      res.sendStatus(404)
     }
   })
 
