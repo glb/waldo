@@ -85,7 +85,9 @@ function slackUserExists (username) {
 
 function dbUserExists (username) {
   let promise = new Promise()
+  console.log('connecting...')
   pg.connect(DB_URL, function (err, client) {
+    console.log('connect callback')
     if (err) {
       console.error('Failed to connect to postgres: ', err)
       promise.reject(err)
