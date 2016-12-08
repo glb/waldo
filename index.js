@@ -25,7 +25,7 @@ pg.connect(DB_URL, function (err, client) {
 })
 
 // Setup slack bot
-childProcess.spawn('node', ['slackbot.js'], {stdio: 'inherit'})
+childProcess.spawn('node', ['src/slackbot.js'], {stdio: 'inherit'})
 
 // Setup slash command
-childProcess.spawn('node', ['slash_command_server.js'], {stdio: 'inherit'})
+childProcess.spawn('node', ['src/slash_command_server.js'], {stdio: 'inherit'})
