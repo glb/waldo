@@ -31,10 +31,10 @@ rtmClient.started(() => {
         users: [users['grahamm'].id, users['morganw'].id].join(',')
       })
       .then(res => {
-        // postMessage({
-        //   channel: res.group.id,
-        //   text: 'Waldo reporting for duty!'
-        // })
+        postMessage({
+          channel: res.group.id,
+          text: 'Waldo reporting for duty!'
+        })
       })
       .catch(err => {
         console.error('Couldn\'t open instant message', err)
