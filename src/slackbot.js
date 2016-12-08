@@ -8,6 +8,7 @@ if (!SLACK_BOT_TOKEN) {
 var slack = require('slack-promise')
 var whereis = require('./whereis.js')
 var UserList = require('./user_list.js')
+var help = require('./help.js')
 
 var rtmClient = slack.rtm.client()
 var token = SLACK_BOT_TOKEN
@@ -57,7 +58,9 @@ rtmClient.message(message => {
       console.error('ERROR weird message:', message)
       return
     }
-    let matches = message.text.match(/where\s?is\s+<@(\S+)>/)
+    console.log(`user messaged me: "${message.text}"`)
+
+    let matches = message.text.match(/\bwhere\s?is\s+<@(\S+)>/)
     if (matches !== null) {
       let userId = matches[1]
       userList.getUser(userId)
@@ -69,7 +72,13 @@ rtmClient.message(message => {
         })
     }
 
-    console.log(`user messaged me: "${message.text}"`)
+    // TODO better parsing
+    if (/\bhelp\b|(\bhow do i)/.test(message.text.toLowerCase())) {
+      postMessage({
+        channel: message.channel,
+        text: help().text
+      })
+    }
   }
 })
 
