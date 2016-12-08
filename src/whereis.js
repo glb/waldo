@@ -45,6 +45,9 @@ function whereis (input) {
                 let result = {
                   text: username + ' location:\n' + printLocation(userRow)
                 }
+                if (username === '@glb') {
+                  result.text = '¯\\_(ツ)_/¯ \n.\n.\nOk, but actually...\n' + result.text
+                }
                 if (userRow.office && userRow.floor) {
                   let imgUrl = `http://floating-reef-60921.herokuapp.com/map/${userRow.office}-${userRow.floor}`
                   result.attachments = [
