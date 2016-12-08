@@ -1,6 +1,7 @@
 var express = require('express')
 var bodyParser = require('body-parser')
 var whereis = require('./whereis_lookup.js')
+var help = require('./help.js')
 
 var VERIFY_TOKEN = process.env.SLACK_VERIFY_TOKEN
 if (!VERIFY_TOKEN) {
@@ -28,9 +29,9 @@ app.route('/whereis')
     var input = req.body.text
 
     if (input === 'help') {     // Handle any help requests
-      response = whereis.whereisHelp()
+      response = help.whereis()
     } else {                    // Lookup user location
-      response = whereis.whereis(input)
+      response = whereis(input)
     }
 
     res.json(response)
