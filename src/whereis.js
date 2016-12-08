@@ -14,25 +14,23 @@ function whereis (input) {
   }
 
   var message
-  var location
+  var userRow
 
   if (invalidSlackUsername(user)) {        // Check for invalid Slack username
     message = `'${user}' doesn't look like a valid Slack username!`
   } else {
-    // Check if user exists in Slack (aka SQL sanitize)
+    // Check if user exists in Slack (+SQL sanitize)
     slackUserExists(user).then(user => {
       if (user) {
         // Check for user location
-        if (user === '@waldo') {               // Easter egg: @waldo
+        if (user === '@waldo') {                        // Easter egg: @waldo
           message = `@waldo is 20000 leagues under the sea! http://floating-reef-60921.herokuapp.com/map/20k`
-        } else if (userRow = dbUserExists(user)) {       // Check if user exists in db location table
-          // get user location for msg
-          // location = getLocation(user)
-          message = user + `'s desk is:` + userRow // + parselocation(location)
-        } else {                               // Return suggestion to talk to @waldo to add location
+        } else if ((userRow = dbUserExists(user)) === true) {      // Check if user exists in db location table
+          message = user + ' location:\n' + printLocation(userRow)
+        } else {                                        // Return suggestion to talk to @waldo to add location
           message = `I don't know where ${user} is.  If you find out, please tell me! (@waldo)`
         }
-      } else {                                  // Return error bc user does not exist in Slack
+      } else {                                          // Return error bc user does not exist in Slack
         message = `Hmm... ${user} doesn't seem to be a current Slack user!`
       }
     })
@@ -80,13 +78,15 @@ function dbUserExists (username) {
         if (err) {
           console.log('Error querying database: ' + err)
         } else {
-          console.log(result.rows)
           userInfo = result.rows
         }
       })
   })
-
   return userInfo
+}
+
+function printLocation (loc) {
+  return loc
 }
 
 module.exports = whereis
