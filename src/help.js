@@ -12,7 +12,8 @@ var sampleUpdateAll = `\`${updatePrefix} ${office} ${floor} ${seat} \``
 function help () {
   return message(`Things you can do:
     Find out where a person's desk is: \`where is @username\`
-    Update a person's location: ${sampleUpdateAll}`)
+    Update a person's location: ${sampleUpdateAll}
+    See the Ottawa fourth floor map: \`show me a map\``)
 }
 help.whereis = () => {
   return message('Just use `/whereis` followed by the username of the person you are trying to find. Example `/whereis @waldo`')
