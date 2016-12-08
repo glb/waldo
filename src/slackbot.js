@@ -80,12 +80,24 @@ rtmClient.message(message => {
       return
     }
 
-    // TODO better parsing
-    if (/\bhelp\b|(\bhow do i)/.test(command.toLowerCase())) {
-      postMessage({
-        channel: message.channel,
-        text: help().text
-      })
+    var commandLC = command.toLowerCase()
+    if (/\bhelp\b|(\bhow do i)/.test(commandLC)) {
+      if (/\bupdate\b/.test(commandLC)) {
+        postMessage({
+          channel: message.channel,
+          text: help.update().text
+        })
+      } else if (/\bwhere\s?is\b/.test(commandLC)) {
+        postMessage({
+          channel: message.channel,
+          text: help.whereis().text
+        })
+      } else {
+        postMessage({
+          channel: message.channel,
+          text: help().text
+        })
+      }
       return
     }
 
