@@ -91,7 +91,7 @@ rtmClient.message(message => {
     if (update) {
       userList.getUser(update.userId)
         .then(user => {
-          whereis.updateUser(user.name, update.location)
+          whereis.updateUser('@' + user.name, update.location)
           postMessage({
             channel: message.channel,
             text: 'Updating...'
