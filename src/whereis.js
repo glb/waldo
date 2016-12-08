@@ -112,12 +112,12 @@ function dbUserExists (username) {
           }
         })
     })
-  }) */
+  })
   return promise
 }
 
 function printLocation (loc) {
-  return loc
+  return `Office: ${loc.office}\n Floor: ${loc.floor}\n Seat: ${loc.seat}`
 }
 
 module.exports = whereis
