@@ -98,7 +98,7 @@ function dbUserExists (username) {
         } else {
           console.log(queryString)
           console.log(result.rows)
-          promise.resolve(result.rows)
+          promise.resolve(result.rows || false)
         }
       })
   })
