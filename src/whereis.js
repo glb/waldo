@@ -1,7 +1,24 @@
-var UserList = require('./user_list.js')
-var pg = require('pg')
-var DB_URL = process.env.DATABASE_URL
+const UserList = require('./user_list.js')
+const pg = require('pg')
+
+// Database setup
+if (!process.env.DATABASE_URL) {
+  console.error("ERROR: Missing environment variable DATABASE_URL")
+  process.exit(1)
+}
+const dbParams = url.parse(process.env.DATABASE_URL);
+const dbAuth = dbParams.auth.split(':');
+const dbConfig = {
+  user: dbAuth[0],
+  password: dbAuth[1],
+  host: dbParams.hostname,
+  port: dbParams.port,
+  database: dbParams.pathname.split('/')[1],
+  ssl: true
+};
 pg.defaults.ssl = true
+const pool = new pg.Pool(dbConfig);
+
 
 var userList = new UserList(process.env.SLACK_BOT_TOKEN)
 /**
@@ -82,107 +99,42 @@ function whereis (input) {
  * @param location {office, floor, seat}
  */
 whereis.updateUser = function updateUser (username, location) {
+  location.office = location.office || null
+  location.floor = location.floor || null
+  location.seat = location.seat || null
+
   console.log('update user functionality')
 
   // insert on user just in case, on conflict do nothing
   console.log('connecting for insert...')
-  pg.connect(DB_URL, function (err, client) {
+  pool.connect(function (err, client, done) {
     console.log('connect callback')
     if (err) {
-      console.error('Failed to connect to postgres: ', err)
+      console.error('error fetching client from pool', err)
       return
     }
 
-    var queryString = `INSERT INTO user_locations (username)
-                        VALUES ('${username}')
-                        ON CONFLICT DO NOTHING`
+    var queryString = `INSERT INTO user_locations (username, office, floor, seat)
+                        VALUES ('${username}', '${location.office}', '${location.floor}, '${location.seat}')
+                        ON CONFLICT DO UPDATE
+                        SET username = EXCLUDED.username` +
+                        (location.office ? ',office = EXCLUDED.office' : '') +
+                        (location.floor ? ',floor = EXCLUDED.floor' : '') +
+                        (location.seat ? ',seat = EXCLUDED.seat' : '')
 
-    client
-      .query(queryString, function (err, result) {
-        if (err) {
-          console.error('Error updating database: ', err)
-        } else {
-          console.log(queryString)
-          updateOtherInfoOnceUserCreated(username, location)   // do the rest
-        }
-      })
+    console.log("Sending query: ", queryString)
+
+    client.query(queryString, function (err, result) {
+      //call `done()` to release the client back to the pool
+      done();
+
+      if (err) {
+        console.error('Error updating database: ', err)
+      } else {
+        console.log('Query successful', queryString)
+      }
+    })
   })
-}
-
-function updateOtherInfoOnceUserCreated (username, location) {
-  var office = location.office
-  var floor = location.floor
-  var seat = location.seat
-
-  if (office) {
-    console.log('connecting for office...')
-    pg.connect(DB_URL, function (err, client) {
-      console.log('connect callback')
-      if (err) {
-        console.error('Failed to connect to postgres: ', err)
-        return
-      }
-
-      var queryString = `UPDATE user_locations
-                        SET office = '${office}'
-                        WHERE username = '${username}' `
-
-      client
-      .query(queryString, function (err, result) {
-        if (err) {
-          console.error('Error updating database: ', err)
-        } else {
-          console.log(queryString)
-        }
-      })
-    })
-  }
-  if (floor) {
-    console.log('connecting for floor...')
-    pg.connect(DB_URL, function (err, client) {
-      console.log('connect callback')
-      if (err) {
-        console.error('Failed to connect to postgres: ', err)
-        return
-      }
-
-      var queryString = `UPDATE user_locations
-                        SET floor = '${floor}'
-                        WHERE username = '${username}' `
-
-      client
-      .query(queryString, function (err, result) {
-        if (err) {
-          console.error('Error updating database: ', err)
-        } else {
-          console.log(queryString)
-        }
-      })
-    })
-  }
-  if (seat) {
-    console.log('connecting for seat...')
-    pg.connect(DB_URL, function (err, client) {
-      console.log('connect callback')
-      if (err) {
-        console.error('Failed to connect to postgres: ', err)
-        return
-      }
-
-      var queryString = `UPDATE user_locations
-                        SET seat = '${seat}'
-                        WHERE username = '${username}' `
-
-      client
-      .query(queryString, function (err, result) {
-        if (err) {
-          console.error('Error updating database: ', err)
-        } else {
-          console.log(queryString)
-        }
-      })
-    })
-  }
 }
 
 // Check for an invalid Slack username
@@ -202,30 +154,34 @@ function slackUserExists (username) {
 function dbUserExists (username) {
   let promise = new Promise((resolve, reject) => {
     console.log('connecting...')
-    pg.connect(DB_URL, function (err, client) {
+    pool.connect(function (err, client, done) {
       console.log('connect callback')
       if (err) {
         console.error('Failed to connect to postgres: ', err)
         reject(err)
+        return
       }
 
       var queryString = 'SELECT * FROM user_locations WHERE username = \'' + username + '\';'
 
-      client
-        .query(queryString, function (err, result) {
-          if (err) {
-            console.error('Error querying database: ', err)
-            reject(err)
+      client.query(queryString, function (err, result) {
+        //call `done()` to release the client back to the pool
+        done();
+
+        if (err) {
+          console.error('Error querying database: ', err)
+          reject(err)
+        } else {
+          console.log(queryString)
+          console.log(result.rows)
+          if (result.rows && result.rows.length > 0) {
+            resolve(result.rows[0])
           } else {
-            console.log(queryString)
-            console.log(result.rows)
-            if (result.rows && result.rows.length > 0) {
-              resolve(result.rows[0])
-            } else {
-              resolve(false)
-            }
+            resolve(false)
           }
-        })
+        }
+      })
+
     })
   })
   return promise
