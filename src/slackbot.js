@@ -49,12 +49,12 @@ rtmClient.message(message => {
   if (message.type !== 'message' || !botUser || message.user === botUser.id) {
     return
   }
+  if (!message.text) {
+    console.error('ERROR weird message:', message)
+    return
+  }
   // if waldo is mentioned, or direct messaged, reply
   if (message.channel[0] === 'D' || message.text.indexOf('@' + botUser.id) > -1) {
-    if (!message.text) {
-      console.error('ERROR weird message:', message)
-      return
-    }
     console.log(`user messaged me: "${message.text}"`)
 
     let command = message.text
