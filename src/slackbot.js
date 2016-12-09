@@ -57,7 +57,7 @@ rtmClient.message(message => {
   if (message.channel[0] === 'D' || message.text.indexOf('@' + botUser.id) > -1) {
     console.log(`user messaged me: "${message.text}"`)
 
-    let command = message.text.toLowerCase()
+    let command = message.text
 
     // if @mentioned trim the command
     if (command.indexOf('@' + botUser.id) > -1) {
@@ -67,7 +67,7 @@ rtmClient.message(message => {
     console.log(`command: ${command}`)
 
     // whereis
-    let matches = command.match(/\bwhere\s?is\s+<@(\S+)>/)
+    let matches = command.match(/\bwhere\s?is\s+<@(\S+)>/i)
     if (matches !== null) {
       let userId = matches[1]
       userList.getUser(userId)
@@ -81,18 +81,18 @@ rtmClient.message(message => {
       return
     }
 
-    if (/\bhelp\b|(\bhow do i)/.test(command)) {
+    if (/\bhelp\b|(\bhow do i)/i.test(command)) {
       if (/\bupdate\b/.test(command)) {
         postMessage({
           channel: message.channel,
           text: help.update().text
         })
-      } else if (/\bwhere\s?is\b/.test(command)) {
+      } else if (/\bwhere\s?is\b/i.test(command)) {
         postMessage({
           channel: message.channel,
           text: help.whereis().text
         })
-      } else if (/\bmap\b/.test(command)) {
+      } else if (/\bmap\b/i.test(command)) {
         postMessage({
           channel: message.channel,
           text: help.map().text
@@ -120,7 +120,7 @@ rtmClient.message(message => {
       return
     }
 
-    if (/show me a map/.test(command.toLowerCase())) {
+    if (/show me a map/i.test(command.toLowerCase())) {
       postMessage({
         channel: message.channel,
         text: 'Map of the Ottawa 4th Floor',
@@ -142,14 +142,14 @@ function parseLocationData (input) {
   let userId = null
 
   // update office
-  matches = input.match(/<@(\S+)>.*\b(\w+)\s+office/)
+  matches = input.match(/<@(\S+)>.*\b(\w+)\s+office/i)
   if (matches !== null) {
     userId = matches[1]
     location.office = matches[2]
   }
 
   // update floor
-  matches = input.match(/<@(\S+)>.*\b([0-9]\w*)\s+floor/) ||
+  matches = input.match(/<@(\S+)>.*\b([0-9]\w*)\s+floor/i) ||
     input.match(/<@(\S+)>.*\bfloor\s+([0-9]\w*)/) ||
     input.match(/<@(\S+)>.*\b(\w+)\s+floor/)
   if (matches !== null) {
@@ -158,7 +158,7 @@ function parseLocationData (input) {
   }
 
   // update seat
-  matches = input.match(/<@(\S+)>.*seat\s+([0-9]+)/)
+  matches = input.match(/<@(\S+)>.*seat\s+([0-9]+)/i)
   if (matches !== null) {
     userId = matches[1]
     location.seat = matches[2]
