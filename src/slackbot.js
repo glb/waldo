@@ -57,7 +57,7 @@ rtmClient.message(message => {
   if (message.channel[0] === 'D' || message.text.indexOf('@' + botUser.id) > -1) {
     console.log(`user messaged me: "${message.text}"`)
 
-    let command = message.text
+    let command = message.text.toLowerCase()
 
     // if @mentioned trim the command
     if (command.indexOf('@' + botUser.id) > -1) {
@@ -81,19 +81,18 @@ rtmClient.message(message => {
       return
     }
 
-    var commandLC = command.toLowerCase()
-    if (/\bhelp\b|(\bhow do i)/.test(commandLC)) {
-      if (/\bupdate\b/.test(commandLC)) {
+    if (/\bhelp\b|(\bhow do i)/.test(command)) {
+      if (/\bupdate\b/.test(command)) {
         postMessage({
           channel: message.channel,
           text: help.update().text
         })
-      } else if (/\bwhere\s?is\b/.test(commandLC)) {
+      } else if (/\bwhere\s?is\b/.test(command)) {
         postMessage({
           channel: message.channel,
           text: help.whereis().text
         })
-      } else if (/\bmap\b/.test(commandLC)) {
+      } else if (/\bmap\b/.test(command)) {
         postMessage({
           channel: message.channel,
           text: help.map().text

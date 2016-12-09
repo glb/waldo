@@ -1,13 +1,14 @@
 const UserList = require('./user_list.js')
 const pg = require('pg')
+const url = require('url')
 
 // Database setup
 if (!process.env.DATABASE_URL) {
-  console.error("ERROR: Missing environment variable DATABASE_URL")
+  console.error('ERROR: Missing environment variable DATABASE_URL')
   process.exit(1)
 }
-const dbParams = url.parse(process.env.DATABASE_URL);
-const dbAuth = dbParams.auth.split(':');
+const dbParams = url.parse(process.env.DATABASE_URL)
+const dbAuth = dbParams.auth.split(':')
 const dbConfig = {
   user: dbAuth[0],
   password: dbAuth[1],
@@ -15,10 +16,9 @@ const dbConfig = {
   port: dbParams.port,
   database: dbParams.pathname.split('/')[1],
   ssl: true
-};
+}
 pg.defaults.ssl = true
-const pool = new pg.Pool(dbConfig);
-
+const pool = new pg.Pool(dbConfig)
 
 var userList = new UserList(process.env.SLACK_BOT_TOKEN)
 /**
@@ -122,11 +122,11 @@ whereis.updateUser = function updateUser (username, location) {
                         (location.floor ? ',floor = EXCLUDED.floor' : '') +
                         (location.seat ? ',seat = EXCLUDED.seat' : '')
 
-    console.log("Sending query: ", queryString)
+    console.log('Sending query: ', queryString)
 
     client.query(queryString, function (err, result) {
-      //call `done()` to release the client back to the pool
-      done();
+      // call `done()` to release the client back to the pool
+      done()
 
       if (err) {
         console.error('Error updating database: ', err)
@@ -165,8 +165,8 @@ function dbUserExists (username) {
       var queryString = 'SELECT * FROM user_locations WHERE username = \'' + username + '\';'
 
       client.query(queryString, function (err, result) {
-        //call `done()` to release the client back to the pool
-        done();
+        // call `done()` to release the client back to the pool
+        done()
 
         if (err) {
           console.error('Error querying database: ', err)
@@ -181,7 +181,6 @@ function dbUserExists (username) {
           }
         }
       })
-
     })
   })
   return promise
