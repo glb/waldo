@@ -150,7 +150,9 @@ function parseLocationData (input) {
   }
 
   // update floor
-  matches = input.match(/<@(\S+)>.*\b([0-9]\w*)\s+floor/) || input.match(/<@(\S+)>.*\bfloor\s+([0-9]\w*)/)
+  matches = input.match(/<@(\S+)>.*\b([0-9]\w*)\s+floor/) ||
+    input.match(/<@(\S+)>.*\bfloor\s+([0-9]\w*)/) ||
+    input.match(/<@(\S+)>.*\b(\w+)\s+floor/)
   if (matches !== null) {
     userId = matches[1]
     location.floor = matches[2]
