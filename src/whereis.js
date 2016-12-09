@@ -2,11 +2,27 @@ const UserList = require('./user_list.js')
 const pg = require('pg')
 const url = require('url')
 
+if (!process.env.WHERES_WALDO_MESSAGE) {
+  console.error('ERROR: Missing environment variable WHERES_WALDO_MESSAGE')
+  process.exit(1)
+}
+
+if (!process.env.WHERES_WALDO_IMAGE_URL) {
+  console.error('ERROR: Missing environment variable WHERES_WALDO_IMAGE_URL')
+  process.exit(1)
+}
+
+if (!process.env.MAPS_URL) {
+  console.error('ERROR: Missing environment variable MAPS_URL')
+  process.exit(1)
+}
+
 // Database setup
 if (!process.env.DATABASE_URL) {
   console.error('ERROR: Missing environment variable DATABASE_URL')
   process.exit(1)
 }
+
 const dbParams = url.parse(process.env.DATABASE_URL)
 const dbAuth = dbParams.auth.split(':')
 const dbConfig = {
@@ -45,11 +61,11 @@ function whereis (input) {
         // Check for user location
         if (user.name === 'waldo') {               // Easter egg: @waldo
           return {
-            text: `@waldo is 20000 leagues under the sea!`,
+            text: WHERES_WALDO_MESSAGE,
             attachments: [
               {
-                fallback: 'http://floating-reef-60921.herokuapp.com/map/20k',
-                image_url: 'http://floating-reef-60921.herokuapp.com/map/20k'
+                fallback: WHERES_WALDO_IMAGE_URL,
+                image_url: WHERES_WALDO_IMAGE_URL,
               }
             ]
           }
@@ -66,7 +82,7 @@ function whereis (input) {
                   result.text = '¯\\_(ツ)_/¯ \n.\n.\nOk, but actually...\n' + result.text
                 }
                 if (userRow.office && userRow.floor) {
-                  let imgUrl = `http://floating-reef-60921.herokuapp.com/map/${userRow.office}-${userRow.floor}`
+                  let imgUrl = `${process.env.MAPS_URL}/${userRow.office}-${userRow.floor}`
                   result.attachments = [
                     {
                       fallback: imgUrl,

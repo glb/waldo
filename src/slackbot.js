@@ -1,7 +1,17 @@
 
+if (!process.env.DEFAULT_MAP_MESSAGE) {
+  console.error('ERROR: Missing environment variable DEFAULT_MAP_MESSAGE')
+  process.exit(1)
+}
+
+if (!process.env.DEFAULT_MAP_URL) {
+  console.error('ERROR: Missing environment variable DEFAULT_MAP_URL')
+  process.exit(1)
+}
+
 var SLACK_BOT_TOKEN = process.env.SLACK_BOT_TOKEN
 if (!SLACK_BOT_TOKEN) {
-  console.error('SLACK_BOT_TOKEN is required')
+  console.error('ERROR: Missing environment variable SLACK_BOT_TOKEN')
   process.exit(1)
 }
 
@@ -125,14 +135,15 @@ rtmClient.message(message => {
       return
     }
 
+    // TODO this should show a map of the user's current location, if known, otherwise a random map from giphy as punishment
     if (/show me a map/i.test(command.toLowerCase())) {
       postMessage({
         channel: message.channel,
-        text: 'Map of the Ottawa 4th Floor',
+        text: DEFAULT_MAP_MESSAGE,
         attachments: [
           {
-            fallback: 'http://floating-reef-60921.herokuapp.com/map/ottawa-4th',
-            image_url: 'http://floating-reef-60921.herokuapp.com/map/ottawa-4th'
+            fallback: DEFAULT_MAP_URL,
+            image_url: DEFAULT_MAP_URL
           }
         ]
       })
