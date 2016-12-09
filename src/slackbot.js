@@ -26,18 +26,23 @@ rtmClient.started(() => {
       }
 
       // let people know bot is online
-      slack.mpim.open({
-        token,
-        users: [users['grahamm'].id, users['morganw'].id].join(',')
-      })
-      .then(res => {
+      slack.channels.list({token})
+      .then(response => {
+        let statusChannel = response.channels.filter(channel => {
+          return channel.name === 'waldo-status'
+        })[0]
+
+        if (!statusChannel) {
+          throw new Error('Channel not found')
+        }
+
         postMessage({
-          channel: res.group.id,
+          channel: statusChannel.id,
           text: 'Waldo reporting for duty!'
         })
       })
       .catch(err => {
-        console.error('Couldn\'t open instant message', err)
+        console.error('Couldn\'t open status channel #waldo-status You may need to create that channel and invite me.', err)
       })
 
       console.log('Started...')
