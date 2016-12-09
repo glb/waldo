@@ -90,6 +90,7 @@ whereis.updateUser = function updateUser (username, location) {
     console.log('connect callback')
     if (err) {
       console.error('Failed to connect to postgres: ', err)
+      return
     }
 
     var queryString = `INSERT INTO user_locations (username)
@@ -119,6 +120,7 @@ function updateOtherInfoOnceUserCreated (username, location) {
       console.log('connect callback')
       if (err) {
         console.error('Failed to connect to postgres: ', err)
+        return
       }
 
       var queryString = `UPDATE user_locations
@@ -141,6 +143,7 @@ function updateOtherInfoOnceUserCreated (username, location) {
       console.log('connect callback')
       if (err) {
         console.error('Failed to connect to postgres: ', err)
+        return
       }
 
       var queryString = `UPDATE user_locations
@@ -163,6 +166,7 @@ function updateOtherInfoOnceUserCreated (username, location) {
       console.log('connect callback')
       if (err) {
         console.error('Failed to connect to postgres: ', err)
+        return
       }
 
       var queryString = `UPDATE user_locations
