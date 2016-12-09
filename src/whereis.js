@@ -115,8 +115,8 @@ whereis.updateUser = function updateUser (username, location) {
     }
 
     var queryString = `INSERT INTO user_locations (username, office, floor, seat)
-                        VALUES ('${username}', '${location.office}', '${location.floor}, '${location.seat}')
-                        ON CONFLICT DO UPDATE
+                        VALUES ('${username}', '${location.office}', '${location.floor}', ${location.seat})
+                        ON CONFLICT (username) DO UPDATE
                         SET username = EXCLUDED.username` +
                         (location.office ? ',office = EXCLUDED.office' : '') +
                         (location.floor ? ',floor = EXCLUDED.floor' : '') +
