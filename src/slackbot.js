@@ -21,7 +21,7 @@ rtmClient.started(() => {
       botUser = users['waldo']
 
       if (!botUser) {
-        console.error('ERROR: bot could not find it\'s own user id')
+        console.error('ERROR: bot could not find its own user id')
         process.exit(1)
       }
 
